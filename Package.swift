@@ -42,7 +42,18 @@ let package = Package(
                 .define("HAVE_GETHOSTUUID", to: "0"),
                 .define("HAVE_STDINT_H"),
                 .define("LTC_NO_TEST"),
-                .define("LTC_NO_FILE")
+                .define("LTC_NO_FILE"),
+                .define("LTC_NO_HASHES"),
+                .define("LTC_NO_PKCS"),
+                .define("LTC_NO_MISC"),
+                .define("LTC_NO_PK"),
+                .define("LTC_NO_MACS"),
+                .define("LTC_MINIMAL"),
+                .define("LTC_SHA512"),
+                .define("LTC_SHA1"),
+                .define("LTC_HMAC"),
+                .define("LTC_PKCS_5"),
+                .define("LTC_HASH_HELPERS")
             ],
             linkerSettings: [
                 .linkedLibrary("log", .when(platforms: [.android]))
