@@ -124,7 +124,7 @@ int pmac_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
         len = sizeof(outtag);
         if ((err = pmac_memory(idx, tests[x].key, 16, tests[x].msg, tests[x].msglen, outtag, &len)) != CRYPT_OK) {
            return err;

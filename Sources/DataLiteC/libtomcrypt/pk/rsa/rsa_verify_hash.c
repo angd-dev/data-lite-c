@@ -131,7 +131,7 @@ int rsa_verify_hash_ex(const unsigned char *sig,            unsigned long  sigle
            hash    OCTET STRING
         }
      */
-      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, loid, sizeof(loid)/sizeof(loid[0]));
+      LTC_SET_ASN1(digestinfo, 0, LTC_ASN1_OBJECT_IDENTIFIER, loid, LTC_ARRAY_SIZE(loid));
       LTC_SET_ASN1(digestinfo, 1, LTC_ASN1_NULL,              NULL,                          0);
       LTC_SET_ASN1(siginfo,    0, LTC_ASN1_SEQUENCE,          digestinfo,                    2);
       LTC_SET_ASN1(siginfo,    1, LTC_ASN1_OCTET_STRING,      tmpbuf,                        siglen);

@@ -548,6 +548,15 @@ const char *crypt_build_settings =
     " LTC_NO_ROLC "
 #endif
 #endif
+#if defined(LTC_HAVE_ROTATE_BUILTIN)
+    " LTC_HAVE_ROTATE_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CLZL_BUILTIN)
+    " LTC_HAVE_CLZL_BUILTIN "
+#endif
+#if defined(LTC_HAVE_CTZL_BUILTIN)
+    " LTC_HAVE_CTZL_BUILTIN "
+#endif
 #if defined(LTC_NO_TEST)
     " LTC_NO_TEST "
 #endif

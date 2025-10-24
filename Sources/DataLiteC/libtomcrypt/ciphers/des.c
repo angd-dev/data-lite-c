@@ -2,6 +2,10 @@
 /* SPDX-License-Identifier: Unlicense */
 #include "tomcrypt_private.h"
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+
 /**
   @file des.c
   DES code submitted by Dobes Vandermeer
@@ -1381,14 +1385,14 @@ static void cookey(const ulong32 *raw1, ulong32 *keyout)
     for(i=0; i < 16; i++, raw1++)
     {
         raw0 = raw1++;
-        *cook    = (ulong32)((*raw0 & 0x00fc0000L) << 6);
-        *cook   |= (ulong32)((*raw0 & 0x00000fc0L) << 10);
-        *cook   |= (ulong32)((*raw1 & 0x00fc0000L) >> 10);
-        *cook++ |= (ulong32)((*raw1 & 0x00000fc0L) >> 6);
-        *cook    = (ulong32)((*raw0 & 0x0003f000L) << 12);
-        *cook   |= (ulong32)((*raw0 & 0x0000003fL) << 16);
-        *cook   |= (ulong32)((*raw1 & 0x0003f000L) >> 4);
-        *cook++ |= (ulong32) (*raw1 & 0x0000003fL);
+        *cook    = (*raw0 & 0x00fc0000L) << 6;
+        *cook   |= (*raw0 & 0x00000fc0L) << 10;
+        *cook   |= (*raw1 & 0x00fc0000L) >> 10;
+        *cook++ |= (*raw1 & 0x00000fc0L) >> 6;
+        *cook    = (*raw0 & 0x0003f000L) << 12;
+        *cook   |= (*raw0 & 0x0000003fL) << 16;
+        *cook   |= (*raw1 & 0x0003f000L) >> 4;
+        *cook++ |= (*raw1 & 0x0000003fL);
     }
 
     XMEMCPY(keyout, dough, sizeof(dough));
@@ -2018,7 +2022,7 @@ int des_test(void)
     symmetric_key skey;
     int i, err;
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des_setup(cases[i].key, 8, 0, &skey)) != CRYPT_OK) {
             return err;
@@ -2125,7 +2129,7 @@ int des3_test(void)
         return err;
     }
 
-    for (i = 0; i < (int)(sizeof(cases)/sizeof(cases[0])); i++)
+    for (i = 0; i < (int)LTC_ARRAY_SIZE(cases); i++)
     {
         if ((err = des3_setup(cases[i].key, 16, 0, &skey)) != CRYPT_OK) {
             return err;
@@ -2243,3 +2247,4 @@ int des3_keysize(int *keysize)
 
 #endif
 
+#pragma clang diagnostic pop

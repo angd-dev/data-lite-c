@@ -24,7 +24,7 @@ static void s_mpi_shrink_multi(void **a, ...)
    cur = a;
    va_start(args, a);
    while (cur != NULL) {
-      if (n >= sizeof(tmp)/sizeof(tmp[0])) {
+      if (n >= LTC_ARRAY_SIZE(tmp)) {
          goto out;
       }
       if (*cur != NULL) {
@@ -49,8 +49,8 @@ out:
     * or after this was called with too many args
     */
    if ((err != CRYPT_OK) ||
-         (n >= sizeof(tmp)/sizeof(tmp[0]))) {
-      for (n = 0; n < sizeof(tmp)/sizeof(tmp[0]); ++n) {
+         (n >= LTC_ARRAY_SIZE(tmp))) {
+      for (n = 0; n < LTC_ARRAY_SIZE(tmp); ++n) {
          if (tmp[n] != NULL) {
             ltc_mp_clear(tmp[n]);
          }

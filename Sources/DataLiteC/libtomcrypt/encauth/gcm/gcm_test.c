@@ -338,7 +338,7 @@ int gcm_test(void)
    if ((err = gcm_done(&gcm, T[0], &y)) != CRYPT_OK)                         return err;
    if (compare_testvector(T[0], y, tests[0].T, 16, "GCM Encrypt Tag-special", 0))      return CRYPT_FAIL_TESTVECTOR;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        y = sizeof(T[0]);
        if ((err = gcm_memory(idx, tests[x].K, tests[x].keylen,
                              tests[x].IV, tests[x].IVlen,
