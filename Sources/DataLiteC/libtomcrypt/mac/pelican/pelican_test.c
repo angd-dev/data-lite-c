@@ -80,7 +80,7 @@ int pelican_test(void)
    unsigned char out[16];
    pelican_state pel;
 
-   for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+   for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        if ((err = pelican_init(&pel, tests[x].K, tests[x].keylen)) != CRYPT_OK) {
           return err;
        }

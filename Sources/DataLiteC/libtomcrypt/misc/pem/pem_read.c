@@ -62,10 +62,10 @@ static void s_tts(char *buf, unsigned long *buflen)
    }
 }
 
-static char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
+static char* s_get_line_i(char *buf, unsigned long *buflen, struct get_char *g, int search_for_start)
 {
-   unsigned long blen = 0;
-   int c = -1, c_;
+   unsigned long blen = 0, wr = 0;
+   int c_;
    if (g->unget_buf.p) {
       if (*buflen < g->unget_buf.len) {
          return NULL;
@@ -75,28 +75,42 @@ static char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
       RESET_STR(g->unget_buf);
       return buf;
    }
-   while(blen < *buflen) {
-      c_ = c;
-      c = g->get(g);
-      if (c == '\n') {
-         buf[blen] = '\0';
+   if (g->prev_get == -1) {
+      return NULL;
+   }
+   while(blen < *buflen || search_for_start) {
+      wr = blen < *buflen ? blen : *buflen - 1;
+      c_ = g->prev_get;
+      g->prev_get = g->get(g);
+      if (g->prev_get == '\n') {
+         buf[wr] = '\0';
          if (c_ == '\r') {
-            buf[--blen] = '\0';
+            buf[--wr] = '\0';
          }
-         s_tts(buf, &blen);
-         *buflen = blen;
+         s_tts(buf, &wr);
+         *buflen = wr;
          return buf;
       }
-      if (c == -1 || c == '\0') {
-         buf[blen] = '\0';
-         s_tts(buf, &blen);
-         *buflen = blen;
+      if (g->prev_get == -1 || g->prev_get == '\0') {
+         buf[wr] = '\0';
+         s_tts(buf, &wr);
+         *buflen = wr;
          return buf;
       }
-      buf[blen] = c;
+      buf[wr] = g->prev_get;
       blen++;
    }
    return NULL;
+}
+
+LTC_INLINE static char* s_get_first_line(char *buf, unsigned long *buflen, struct get_char *g)
+{
+   return s_get_line_i(buf, buflen, g, 1);
+}
+
+LTC_INLINE static char* s_get_line(char *buf, unsigned long *buflen, struct get_char *g)
+{
+   return s_get_line_i(buf, buflen, g, 0);
 }
 
 static LTC_INLINE int s_fits_buf(void *dest, unsigned long to_write, void *end)
@@ -176,20 +190,29 @@ static int s_pem_decode_headers(struct pem_headers *hdr, struct get_char *g)
    return CRYPT_OK;
 }
 
-int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_char *g)
+int pem_read(void *asn1_cert, unsigned long *asn1_len, struct pem_headers *hdr, struct get_char *g)
 {
    char buf[LTC_PEM_DECODE_BUFSZ];
-   char *wpem = pem;
-   char *end = wpem + *w;
+   char *wpem = asn1_cert;
+   char *end = wpem + *asn1_len;
+   const char pem_start[] = "----";
    unsigned long slen, linelen;
    int err, hdr_ok = 0;
    int would_overflow = 0;
    unsigned char empty_lines = 0;
 
-   linelen = sizeof(buf);
-   if (s_get_line(buf, &linelen, g) == NULL) {
-      return CRYPT_INVALID_PACKET;
-   }
+   g->prev_get = 0;
+   do {
+      linelen = sizeof(buf);
+      if (s_get_first_line(buf, &linelen, g) == NULL) {
+         if (g->prev_get == -1)
+            return CRYPT_NOP;
+         else
+            return CRYPT_INVALID_PACKET;
+      }
+      if (linelen < sizeof(pem_start) - 1)
+         continue;
+   } while(XMEMCMP(buf, pem_start, sizeof(pem_start) - 1) != 0);
    if (hdr->id->start.len != linelen || XMEMCMP(buf, hdr->id->start.p, hdr->id->start.len)) {
       s_unget_line(buf, linelen, g);
       return CRYPT_UNKNOWN_PEM;
@@ -226,16 +249,16 @@ int pem_read(void *pem, unsigned long *w, struct pem_headers *hdr, struct get_ch
       /* NUL termination */
       wpem++;
       /* prevent a wrap-around */
-      if (wpem < (char*)pem)
+      if (wpem < (char*)asn1_cert)
          return CRYPT_OVERFLOW;
-      *w = wpem - (char*)pem;
+      *asn1_len = wpem - (char*)asn1_cert;
       return CRYPT_BUFFER_OVERFLOW;
    }
 
-   *w = wpem - (char*)pem;
+   *asn1_len = wpem - (char*)asn1_cert;
    *wpem++ = '\0';
 
-   if ((err = base64_strict_decode(pem, *w, pem, w)) != CRYPT_OK) {
+   if ((err = base64_strict_decode(asn1_cert, *asn1_len, asn1_cert, asn1_len)) != CRYPT_OK) {
       return err;
    }
    return CRYPT_OK;

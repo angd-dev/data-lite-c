@@ -98,7 +98,7 @@ int xcbc_test(void)
      }
   }
 
-  for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+  for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
      taglen = 16;
      if ((err = xcbc_memory(idx, tests[x].K, 16, tests[x].M, tests[x].msglen, T, &taglen)) != CRYPT_OK) {
         return err;

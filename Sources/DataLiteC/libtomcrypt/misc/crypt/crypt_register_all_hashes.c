@@ -89,8 +89,13 @@ int register_all_hashes(void)
    REGISTER_HASH(&blake2b_512_desc);
 #endif
 #ifdef LTC_CHC_HASH
-   REGISTER_HASH(&chc_desc);
-   LTC_ARGCHK(chc_register(find_cipher_any("aes", 8, 16)) == CRYPT_OK);
+   {
+      int aes_index = find_cipher_any("aes", 8, 16);
+      if (aes_index != -1) {
+         REGISTER_HASH(&chc_desc);
+         LTC_ARGCHK(chc_register(aes_index) == CRYPT_OK);
+      }
+   }
 #endif
    return CRYPT_OK;
 }

@@ -73,7 +73,7 @@ int lrw_test(void)
      }
   }
 
-  for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+  for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
      /* schedule it */
      if ((err = lrw_start(idx, tests[x].IV, tests[x].key, 16, tests[x].tweak, 0, &lrw)) != CRYPT_OK) {
         return err;

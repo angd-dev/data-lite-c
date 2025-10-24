@@ -281,7 +281,17 @@ typedef struct {
 
     /** The private key */
     void *k;
+
+    /** The hash algorithm to use when creating a signature.
+     *  Setting this will enable RFC6979 compatible signature generation.
+     *  The macro ECC_SET_RFC6979_HASH_ALG() is provided as a helper
+     *  to set this.*/
+    const char *rfc6979_hash_alg;
 } ecc_key;
+
+#define ECC_SET_RFC6979_HASH_ALG(key, alg) do { \
+   (key)->rfc6979_hash_alg = (alg);             \
+} while(0)
 
 /** Formats of ECC signatures */
 typedef enum ecc_signature_type_ {
@@ -834,7 +844,6 @@ int der_encode_object_identifier(const unsigned long *words, unsigned long  nwor
 int der_decode_object_identifier(const unsigned char *in,    unsigned long  inlen,
                                        unsigned long *words, unsigned long *outlen);
 int der_length_object_identifier(const unsigned long *words, unsigned long nwords, unsigned long *outlen);
-unsigned long der_object_identifier_bits(unsigned long x);
 
 /* IA5 STRING */
 int der_encode_ia5_string(const unsigned char *in, unsigned long inlen,
@@ -842,9 +851,6 @@ int der_encode_ia5_string(const unsigned char *in, unsigned long inlen,
 int der_decode_ia5_string(const unsigned char *in, unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen);
 int der_length_ia5_string(const unsigned char *octets, unsigned long noctets, unsigned long *outlen);
-
-int der_ia5_char_encode(int c);
-int der_ia5_value_decode(int v);
 
 /* TELETEX STRING */
 int der_decode_teletex_string(const unsigned char *in, unsigned long inlen,
@@ -857,9 +863,6 @@ int der_encode_printable_string(const unsigned char *in, unsigned long inlen,
 int der_decode_printable_string(const unsigned char *in, unsigned long inlen,
                                 unsigned char *out, unsigned long *outlen);
 int der_length_printable_string(const unsigned char *octets, unsigned long noctets, unsigned long *outlen);
-
-int der_printable_char_encode(int c);
-int der_printable_value_decode(int v);
 
 /* UTF-8 */
 #if (defined(SIZE_MAX) || __STDC_VERSION__ >= 199901L || defined(WCHAR_MAX) || defined(__WCHAR_MAX__) || defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED) || defined (__WCHAR_TYPE__)) && !defined(LTC_NO_WCHAR)
@@ -880,7 +883,6 @@ int der_encode_utf8_string(const wchar_t *in,  unsigned long inlen,
 
 int der_decode_utf8_string(const unsigned char *in,  unsigned long inlen,
                                        wchar_t *out, unsigned long *outlen);
-unsigned long der_utf8_charsize(const wchar_t c);
 int der_length_utf8_string(const wchar_t *in, unsigned long noctets, unsigned long *outlen);
 
 
