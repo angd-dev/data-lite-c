@@ -51,7 +51,7 @@ int ctr_test(void)
      }
   }
 
-  for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+  for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
      if ((err = ctr_start(idx, tests[x].IV, tests[x].key, tests[x].keylen, 0, CTR_COUNTER_BIG_ENDIAN|LTC_CTR_RFC3686, &ctr)) != CRYPT_OK) {
         return err;
      }

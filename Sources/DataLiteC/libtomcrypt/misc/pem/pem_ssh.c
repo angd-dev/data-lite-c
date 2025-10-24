@@ -51,7 +51,7 @@ const struct blockcipher_info ssh_ciphers[] =
    { .name = "twofish256-cbc",                .algo = "twofish",  .keylen = 256 / 8, .mode = cm_cbc                 },
    { .name = "twofish256-ctr",                .algo = "twofish",  .keylen = 256 / 8, .mode = cm_ctr                 },
 };
-const unsigned long ssh_ciphers_num = sizeof(ssh_ciphers)/sizeof(ssh_ciphers[0]);
+const unsigned long ssh_ciphers_num = LTC_ARRAY_SIZE(ssh_ciphers);
 
 struct kdf_options {
    const char *name;
@@ -402,7 +402,7 @@ static int s_decode_key(const unsigned char *in, unsigned long *inlen, ltc_pka_k
    remaining -= cur_len;
    cur_len = remaining;
 
-   for (n = 0; n < sizeof(ssh_pkas)/sizeof(ssh_pkas[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(ssh_pkas); ++n) {
       if (ssh_pkas[n].name.p != NULL) {
          if (pkalen != ssh_pkas[n].name.len
                || XMEMCMP(pka, ssh_pkas[n].name.p, ssh_pkas[n].name.len) != 0) continue;
@@ -415,7 +415,7 @@ static int s_decode_key(const unsigned char *in, unsigned long *inlen, ltc_pka_k
       }
       break;
    }
-   if (n == sizeof(ssh_pkas)/sizeof(ssh_pkas[0])) {
+   if (n == LTC_ARRAY_SIZE(ssh_pkas)) {
       return CRYPT_PK_INVALID_TYPE;
    }
 
@@ -490,7 +490,7 @@ static int s_parse_line(char *line, unsigned long *len, ltc_pka_key *key, char *
 
    rlen = *len;
    /* Chop up string into the three authorized_keys_elements */
-   for (n = 0; n < sizeof(elements)/sizeof(elements[0]) && rlen; ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(elements) && rlen; ++n) {
       skip_spaces(&r, &rlen);
       elements[n].p = r;
       if (n != 2)
@@ -502,7 +502,7 @@ static int s_parse_line(char *line, unsigned long *len, ltc_pka_key *key, char *
       r++;
    }
 
-   for (n = 0; n < sizeof(ssh_pkas)/sizeof(ssh_pkas[0]); ++n) {
+   for (n = 0; n < LTC_ARRAY_SIZE(ssh_pkas); ++n) {
       if (ssh_pkas[n].name.p != NULL) {
          if (elements[ake_algo_name].len != ssh_pkas[n].name.len
                || XMEMCMP(elements[ake_algo_name].p, ssh_pkas[n].name.p, ssh_pkas[n].name.len) != 0) continue;
@@ -711,7 +711,7 @@ static const struct pem_header_id pem_openssh[] = {
      .flags = pf_public
    },
 };
-static const unsigned long pem_openssh_num = sizeof(pem_openssh)/sizeof(pem_openssh[0]);
+static const unsigned long pem_openssh_num = LTC_ARRAY_SIZE(pem_openssh);
 
 static int s_decode_openssh(struct get_char *g, ltc_pka_key *k, const password_ctx *pw_ctx)
 {
@@ -819,9 +819,11 @@ int ssh_read_authorized_keys_filehandle(FILE *f, ssh_authorized_key_cb cb, void 
    LTC_ARGCHK(f != NULL);
    LTC_ARGCHK(cb != NULL);
 
-   fseek(f, 0, SEEK_END);
+   if (fseek(f, 0, SEEK_END) == -1)
+      return CRYPT_ERROR;
    tot_data = ftell(f);
-   rewind(f);
+   if (fseek(f, 0, SEEK_SET) == -1)
+      return CRYPT_ERROR;
    buf = XMALLOC(tot_data);
    if (buf == NULL) {
       return CRYPT_MEM;

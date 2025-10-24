@@ -70,7 +70,7 @@ int x509_decode_subject_public_key_info(const unsigned char *in, unsigned long i
    }
 
    /* this includes the internal hash ID and optional params (NULL in this case) */
-   LTC_SET_ASN1(alg_id, 0, LTC_ASN1_OBJECT_IDENTIFIER, tmpoid, sizeof(tmpoid)/sizeof(tmpoid[0]));
+   LTC_SET_ASN1(alg_id, 0, LTC_ASN1_OBJECT_IDENTIFIER, tmpoid, LTC_ARRAY_SIZE(tmpoid));
    if (parameters_type == LTC_ASN1_EOL) {
       alg_id_num = 1;
    } else {

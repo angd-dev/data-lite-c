@@ -66,7 +66,7 @@ int pk_get_oid_id(enum ltc_pka_id pka, enum ltc_oid_id *oid)
 {
    unsigned int i;
    LTC_ARGCHK(oid != NULL);
-   for (i = 1; i < sizeof(pka_oids)/sizeof(pka_oids[0]); ++i) {
+   for (i = 1; i < LTC_ARRAY_SIZE(pka_oids); ++i) {
       if (pka_oids[i].pka == pka) {
          *oid = pka_oids[i].id;
          return CRYPT_OK;
@@ -95,7 +95,7 @@ int pk_get_oid_from_asn1(const ltc_asn1_list *oid, enum ltc_oid_id *id)
       return err;
    }
 
-   for (i = 1; i < sizeof(pka_oids)/sizeof(pka_oids[0]); ++i) {
+   for (i = 1; i < LTC_ARRAY_SIZE(pka_oids); ++i) {
       if (XSTRCMP(pka_oids[i].oid, tmp) == 0) {
          *id = pka_oids[i].id;
          return CRYPT_OK;

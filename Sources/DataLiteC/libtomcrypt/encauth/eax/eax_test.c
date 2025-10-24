@@ -216,7 +216,7 @@ int eax_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
         len = sizeof(outtag);
         if ((err = eax_encrypt_authenticate_memory(idx, tests[x].key, tests[x].keylen,
             tests[x].nonce, tests[x].noncelen, tests[x].header, tests[x].headerlen,

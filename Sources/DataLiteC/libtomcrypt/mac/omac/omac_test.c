@@ -76,7 +76,7 @@ int omac_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
        len = sizeof(out);
        if ((err = omac_memory(idx, tests[x].key, tests[x].keylen, tests[x].msg, tests[x].msglen, out, &len)) != CRYPT_OK) {
           return err;

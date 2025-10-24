@@ -167,7 +167,7 @@ int ocb_test(void)
        }
     }
 
-    for (x = 0; x < (int)(sizeof(tests)/sizeof(tests[0])); x++) {
+    for (x = 0; x < (int)LTC_ARRAY_SIZE(tests); x++) {
         len = sizeof(outtag);
         if ((err = ocb_encrypt_authenticate_memory(idx, tests[x].key, 16,
              tests[x].nonce, tests[x].pt, tests[x].ptlen, outct, outtag, &len)) != CRYPT_OK) {
